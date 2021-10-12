@@ -24,6 +24,9 @@ const IssuesSchema = new mongoose.Schema(
     status_text: {
       type: String,
     },
+    project_name: {
+      type: String,
+    },
   },
   {
     timestamps: true,
