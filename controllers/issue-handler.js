@@ -35,14 +35,15 @@ const getIssues = async (req, res) => {
   } else if (open === "true") {
     queryObject.open = true;
   }
-  console.log(queryObject);
   const existingIssues = await Issues.find({
     project_name: projectName,
     ...queryObject,
   });
 
   if (existingIssues.length < 1) {
-    throw new NotFoundError(`Project ${projectName} has no existing issues`);
+    throw new NotFoundError(
+      `Project ${projectName} has no existing issues which match the parameters provided`
+    );
   }
   const nbHits = existingIssues.length;
   res.status(StatusCodes.OK).json({ nbHits, existingIssues });
@@ -68,8 +69,18 @@ const createIssue = async (req, res) => {
 const updateIssue = (req, res) => {
   res.send("get issues");
 };
-const deleteIssue = (req, res) => {
-  res.send("get issues");
+const deleteIssue = async (req, res) => {
+  const { _id } = req.body;
+  if (!_id) {
+    throw new BadRequestError(`missing _id`);
+  }
+  const issue = await Issues.findByIdAndDelete({ _id });
+  if (!issue) {
+    throw new NotFoundError(`No issue with _id: ${_id}`);
+  }
+  res
+    .status(StatusCodes.OK)
+    .json({ result: `successfully deleted, _id: ${_id}` });
 };
 
 module.exports = {

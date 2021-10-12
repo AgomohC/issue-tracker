@@ -4,8 +4,12 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     statusCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
     msg: err.message || "Something went wrong, try again later",
   };
-
-  return res.status(customError.statusCode).json({ msg: customError.msg });
+  if (err.name === "CastError") {
+    console.log(err);
+    customError.msg = `_id ${err.value._id} is invalid`;
+    customError.statusCode = StatusCodes.BAD_REQUEST;
+  }
+  return res.status(customError.statusCode).json({ error: customError.msg });
 };
 
 module.exports = errorHandlerMiddleware;
