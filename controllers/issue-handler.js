@@ -1,8 +1,13 @@
+// import models
 const Issues = require("../models/Issues");
 
+// import http-status-codes
 const { StatusCodes } = require("http-status-codes");
+
+//  import errors
 const { BadRequestError, NotFoundError } = require("../errors");
 
+// get issues handler
 const getIssues = async (req, res) => {
   const { projectName } = req.params;
   const {
@@ -13,8 +18,11 @@ const getIssues = async (req, res) => {
     assigned_to,
     status_text,
   } = req.query;
+
+  // initialize filter object
   let queryObject = {};
 
+  // filter parameters
   if (issue_title) {
     queryObject.issue_title = issue_title;
   }
@@ -35,11 +43,14 @@ const getIssues = async (req, res) => {
   } else if (open === "true") {
     queryObject.open = true;
   }
+
+  // find issues with corresponding project_name and filter parameters
   const existingIssues = await Issues.find({
     project_name: projectName,
     ...queryObject,
   });
 
+  // check if existing issues is empty
   if (existingIssues.length < 1) {
     throw new NotFoundError(
       `Project ${projectName} has no existing issues which match the parameters provided`
@@ -48,11 +59,15 @@ const getIssues = async (req, res) => {
   const nbHits = existingIssues.length;
   res.status(StatusCodes.OK).json({ nbHits, existingIssues });
 };
+
+// create new issue
 const createIssue = async (req, res) => {
   const { projectName } = req.params;
 
   const { issue_title, issue_text, created_by, assigned_to, status_text } =
     req.body;
+
+  // input validation
   if (!issue_title || !issue_text || !created_by) {
     throw new BadRequestError("required field(s) missing");
   }
@@ -64,8 +79,11 @@ const createIssue = async (req, res) => {
     status_text,
     project_name: projectName,
   });
+  // json return
   res.status(StatusCodes.CREATED).json({ newIssue });
 };
+
+// update issue
 const updateIssue = async (req, res) => {
   const {
     _id,
@@ -76,6 +94,7 @@ const updateIssue = async (req, res) => {
     status_text,
     open,
   } = req.body;
+  //  input validation
   if (!_id) {
     throw new BadRequestError(`missing _id`);
   }
@@ -85,10 +104,12 @@ const updateIssue = async (req, res) => {
     !created_by &&
     !assigned_to &&
     !status_text &&
-    !open
+    open === undefined
   ) {
     throw new BadRequestError(`no update field(s) sent, _id: ${_id}`);
   }
+
+  //   update object
   let updateObject = {};
 
   if (issue_title) {
@@ -111,22 +132,22 @@ const updateIssue = async (req, res) => {
   } else if (open === true) {
     updateObject.open = true;
   }
-  console.log(updateObject);
-  const updatedIssue = await Issues.findOneAndUpdate(
-    { _id, _id },
-    updateObject,
-    {
-      new: true,
-    }
-  );
+
+  // update issue in the database
+  const updatedIssue = await Issues.findOneAndUpdate({ _id }, updateObject, {
+    new: true,
+  });
   if (!updatedIssue) {
     throw new NotFoundError(`No issue with _id: ${_id}`);
   }
-  console.log(updatedIssue);
-  res
+
+  // json return
+  return res
     .status(StatusCodes.OK)
     .json({ result: `successfully updated, _id: ${_id}` });
 };
+
+//  delete issue
 const deleteIssue = async (req, res) => {
   const { _id } = req.body;
   if (!_id) {
@@ -136,7 +157,9 @@ const deleteIssue = async (req, res) => {
   if (!issue) {
     throw new NotFoundError(`No issue with _id: ${_id}`);
   }
-  res
+
+  // json return
+  return res
     .status(StatusCodes.OK)
     .json({ result: `successfully deleted, _id: ${_id}` });
 };
