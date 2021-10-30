@@ -5,21 +5,21 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const helmet = require("helmet");
-
+const rateLimit = require("express-rate-limit");
 const trackerRoutes = require("./routes/issueTracker");
 const notFound = require("./middleware/not-found");
 const errorHandler = require("./middleware/error-handler");
 
-// // configure rate limiter for reverse proxies
-// app.set("trust proxy", 1);
+// configure rate limiter for reverse proxies
+app.set("trust proxy", 1);
 
-// //configure rate limiter to allow only 100 requests from a client every 15 minutes
-// app.use(
-//   rateLimit({
-//     windowMS: 15 * 60 * 1000,
-//     max: 100,
-//   })
-// );
+//configure rate limiter to allow only 100 requests from a client every 15 minutes
+app.use(
+  rateLimit({
+    windowMS: 15 * 60 * 1000,
+    max: 100,
+  })
+);
 
 //middleware
 app.use(express.json());

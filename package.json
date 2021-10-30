@@ -23,12 +23,13 @@
   "bugs": {
     "url": "https://github.com/AgomohC/issue-tracker/issues"
   },
-  "homepage": "",
+  "homepage": "https://femto-issue-tracker.herokuapp.com/",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
+    "express-rate-limit": "^5.5.0",
     "helmet": "^4.6.0",
     "http-status-codes": "^2.1.4",
     "mongoose": "^6.0.10"
