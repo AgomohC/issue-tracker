@@ -57,7 +57,7 @@ const getIssues = async (req, res) => {
     );
   }
   const nbHits = existingIssues.length;
-  res.status(StatusCodes.OK).json({ nbHits, existingIssues });
+  return res.status(StatusCodes.OK).json({ nbHits, existingIssues });
 };
 
 // create new issue
@@ -80,7 +80,7 @@ const createIssue = async (req, res) => {
     project_name: projectName,
   });
   // json return
-  res.status(StatusCodes.CREATED).json({ newIssue });
+  return res.status(StatusCodes.CREATED).json({ newIssue });
 };
 
 // update issue
